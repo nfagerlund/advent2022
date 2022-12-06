@@ -50,6 +50,12 @@ fn score_outcome(outcome: Outcome) -> usize {
     }
 }
 
+fn score_matches(scoring: &HashMap<String, usize>, matches: &str) -> usize {
+    matches.lines()
+        .map(|match_text| scoring.get(match_text).unwrap())
+        .fold(0, |total, round| total + *round)
+}
+
 #[derive(Clone, Copy)]
 enum Shape {
     Rock,
@@ -69,11 +75,11 @@ fn part_two(inputs: &str) -> usize {
     let mut scoring: HashMap<String, usize> = HashMap::new();
     for &outcome_code in ["X", "Y", "Z"].iter() {
         // x => lose, y => draw, z => win
+        let outcome = real_outcome(outcome_code);
+        let result_score = score_outcome(outcome);
         for &face_code in ["A", "B", "C"].iter() {
             let match_text = format!("{face_code} {outcome_code}");
-            let outcome = real_outcome(outcome_code);
             let face = real_faced_shape(face_code);
-            let result_score = score_outcome(outcome);
             let desired_shape = match (face, outcome) {
                 (Shape::Paper, Outcome::Win) => Shape::Scissors,
                 (Shape::Paper, Outcome::Lose) => Shape::Rock,
@@ -93,9 +99,7 @@ fn part_two(inputs: &str) -> usize {
         }
     }
 
-    inputs.lines()
-        .map(|match_text| scoring.get(match_text).unwrap())
-        .fold(0, |total, round| total + *round)
+    score_matches(&scoring, inputs)
 }
 
 // a, x = rock (1 point)
@@ -118,9 +122,11 @@ fn part_one(inputs: &str) -> usize {
                 (Shape::Rock, Shape::Rock) => Outcome::Draw,
                 (Shape::Rock, Shape::Scissors) => Outcome::Lose,
                 (Shape::Rock, Shape::Paper) => Outcome::Win,
+
                 (Shape::Scissors, Shape::Rock) => Outcome::Win,
                 (Shape::Scissors, Shape::Scissors) => Outcome::Draw,
                 (Shape::Scissors, Shape::Paper) => Outcome::Lose,
+
                 (Shape::Paper, Shape::Rock) => Outcome::Lose,
                 (Shape::Paper, Shape::Scissors) => Outcome::Win,
                 (Shape::Paper, Shape::Paper) => Outcome::Draw,
@@ -131,9 +137,7 @@ fn part_one(inputs: &str) -> usize {
         }
     }
 
-    inputs.lines()
-        .map(|match_text| scoring.get(match_text).unwrap())
-        .fold(0, |total, round| total + *round)
+    score_matches(&scoring, inputs)
 }
 
 #[cfg(test)]
