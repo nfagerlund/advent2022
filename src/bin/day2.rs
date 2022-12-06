@@ -19,40 +19,42 @@ fn part_one(inputs: &str) -> usize {
     // wait... let's just precompute all the possible round scores, it's only
     // rock paper scissors after all. Then we only do the math once.
     let mut scoring: HashMap<String, usize> = HashMap::new();
-    for &play in ["A", "B", "C"].iter() {
-        for &face in ["X", "Y", "Z"].iter() {
-            let shape_score: usize;
-            let result_score: usize;
-            let match_text = format!("{play} {face}");
-            match play {
-                "A" => {
-                    shape_score = 1;
-                    result_score = match face {
-                        "X" => 3,
-                        "Y" => 0,
-                        "Z" => 6,
-                        _ => panic!("huh????"),
-                    };
+    for &play in ["X", "Y", "Z"].iter() {
+        let shape_score: usize = match play {
+            "X" => 1,
+            "Y" => 2,
+            "Z" => 3,
+            _ => panic!("huh?!?!"),
+        };
+        for &face in ["A", "B", "C"].iter() {
+            let match_text = format!("{face} {play}");
+            let result_score: usize = match play {
+                "X" => {
+                    match face {
+                        "A" => 3,
+                        "B" => 0,
+                        "C" => 6,
+                        _ => panic!("no"),
+                    }
                 },
-                "B" => {
-                    shape_score = 2;
-                    result_score = match face {
-                        "X" => 6,
-                        "Y" => 3,
-                        "Z" => 0,
-                        _ => panic!("huh????"),
-                    };
+                "Y" => {
+                    match face {
+                        "A" => 6,
+                        "B" => 3,
+                        "C" => 0,
+                        _ => panic!("no"),
+                    }
                 },
-                "C" => {
-                    shape_score = 3;
-                    result_score = match face {
-                        "X" => 0,
-                        "Y" => 6,
-                        "Z" => 3,
-                        _ => panic!("huh????"),
-                    };
+                "Z" => {
+                    match face {
+                        "A" => 0,
+                        "B" => 6,
+                        "C" => 3,
+                        _ => panic!("no"),
+                    }
+
                 },
-                _ => panic!("lol wut"),
+                _ => panic!("nah!!"),
             };
             let score = shape_score + result_score;
             scoring.insert(match_text, score);
