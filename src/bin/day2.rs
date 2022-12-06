@@ -25,12 +25,39 @@ fn real_faced_shape(code: &str) -> Shape {
     }
 }
 
+fn real_played_shape(code: &str) -> Shape {
+    match code {
+        "X" => Shape::Rock,
+        "Y" => Shape::Paper,
+        "Z" => Shape::Scissors,
+        _ => panic!("meh"),
+    }
+}
+
+fn score_shape(shape: Shape) -> usize {
+    match shape {
+        Shape::Rock => 1,
+        Shape::Paper => 2,
+        Shape::Scissors => 3,
+    }
+}
+
+fn score_outcome(outcome: Outcome) -> usize {
+    match outcome {
+        Outcome::Win => 6,
+        Outcome::Lose => 0,
+        Outcome::Draw => 3,
+    }
+}
+
+#[derive(Clone, Copy)]
 enum Shape {
     Rock,
     Scissors,
     Paper,
 }
 
+#[derive(Clone, Copy)]
 enum Outcome {
     Win,
     Lose,
@@ -44,12 +71,10 @@ fn part_two(inputs: &str) -> usize {
         // x => lose, y => draw, z => win
         for &face_code in ["A", "B", "C"].iter() {
             let match_text = format!("{face_code} {outcome_code}");
-            let result_score: usize = match real_outcome(outcome_code) {
-                Outcome::Lose => 0,
-                Outcome::Draw => 3,
-                Outcome::Win => 6,
-            };
-            let desired_shape = match (real_faced_shape(face_code), real_outcome(outcome_code)) {
+            let outcome = real_outcome(outcome_code);
+            let face = real_faced_shape(face_code);
+            let result_score = score_outcome(outcome);
+            let desired_shape = match (face, outcome) {
                 (Shape::Paper, Outcome::Win) => Shape::Scissors,
                 (Shape::Paper, Outcome::Lose) => Shape::Rock,
                 (Shape::Paper, Outcome::Draw) => Shape::Paper,
@@ -62,11 +87,7 @@ fn part_two(inputs: &str) -> usize {
                 (Shape::Scissors, Outcome::Lose) => Shape::Paper,
                 (Shape::Scissors, Outcome::Draw) => Shape::Scissors,
             };
-            let shape_score: usize = match desired_shape {
-                Shape::Rock => 1,
-                Shape::Paper => 2,
-                Shape::Scissors => 3,
-            };
+            let shape_score = score_shape(desired_shape);
             let score = shape_score + result_score;
             scoring.insert(match_text, score);
         }
@@ -87,43 +108,24 @@ fn part_one(inputs: &str) -> usize {
     // wait... let's just precompute all the possible round scores, it's only
     // rock paper scissors after all. Then we only do the math once.
     let mut scoring: HashMap<String, usize> = HashMap::new();
-    for &play in ["X", "Y", "Z"].iter() {
-        let shape_score: usize = match play {
-            "X" => 1,
-            "Y" => 2,
-            "Z" => 3,
-            _ => panic!("huh?!?!"),
-        };
-        for &face in ["A", "B", "C"].iter() {
-            let match_text = format!("{face} {play}");
-            let result_score: usize = match play {
-                "X" => {
-                    match face {
-                        "A" => 3,
-                        "B" => 0,
-                        "C" => 6,
-                        _ => panic!("no"),
-                    }
-                },
-                "Y" => {
-                    match face {
-                        "A" => 6,
-                        "B" => 3,
-                        "C" => 0,
-                        _ => panic!("no"),
-                    }
-                },
-                "Z" => {
-                    match face {
-                        "A" => 0,
-                        "B" => 6,
-                        "C" => 3,
-                        _ => panic!("no"),
-                    }
-
-                },
-                _ => panic!("nah!!"),
+    for &play_code in ["X", "Y", "Z"].iter() {
+        let play = real_played_shape(play_code);
+        let shape_score: usize = score_shape(play);
+        for &face_code in ["A", "B", "C"].iter() {
+            let face = real_faced_shape(face_code);
+            let match_text = format!("{face_code} {play_code}");
+            let outcome = match (face, play) {
+                (Shape::Rock, Shape::Rock) => Outcome::Draw,
+                (Shape::Rock, Shape::Scissors) => Outcome::Lose,
+                (Shape::Rock, Shape::Paper) => Outcome::Win,
+                (Shape::Scissors, Shape::Rock) => Outcome::Win,
+                (Shape::Scissors, Shape::Scissors) => Outcome::Draw,
+                (Shape::Scissors, Shape::Paper) => Outcome::Lose,
+                (Shape::Paper, Shape::Rock) => Outcome::Lose,
+                (Shape::Paper, Shape::Scissors) => Outcome::Win,
+                (Shape::Paper, Shape::Paper) => Outcome::Draw,
             };
+            let result_score = score_outcome(outcome);
             let score = shape_score + result_score;
             scoring.insert(match_text, score);
         }
