@@ -18,33 +18,6 @@ fn build_priorities() -> HashMap<char, usize> {
     }
     stuff
 }
-
-struct TripleState {
-    seen: HashSet<u8>,
-    reserve: HashSet<u8>,
-    iteration: usize,
-    sum: usize,
-}
-
-impl TripleState {
-    fn new() -> Self {
-        Self {
-            seen: HashSet::new(),
-            reserve: HashSet::new(),
-            iteration: 0,
-            sum: 0,
-        }
-    }
-
-    fn observe(&mut self) {
-
-
-        if self.iteration >= 2 {
-            // reset, we're on a new group of three.
-        }
-    }
-}
-
 struct Priorities;
 impl Priorities {
     fn get(c: char) -> Option<usize> {
@@ -71,8 +44,25 @@ impl Priorities {
 
 // I think I can use hashsets real dumbly for this one, too.
 fn part_two(inputs: &str) -> usize {
+    let mut lines = inputs.lines();
+    let mut sum = 0_usize;
+    while let (Some(first), Some(second), Some(third)) = (lines.next(), lines.next(), lines.next()) {
+        let mut seen: HashSet<u8> = HashSet::new();
+        for i in first.as_bytes().iter() {
+            seen.insert(*i);
+        }
+        let mut repeated: HashSet<u8> = HashSet::new();
+        for i in second.as_bytes().iter() {
+            if seen.contains(i) {
+                repeated.insert(*i);
+            }
+        }
+        let everywhere = third.as_bytes().iter().find(|&i| { repeated.contains(i) }).unwrap();
+        let priority = Priorities::get_byte(*everywhere).unwrap();
+        sum += priority;
+    }
 
-    0
+    sum
 }
 
 fn part_one(inputs: &str) -> usize {
