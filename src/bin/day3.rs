@@ -19,6 +19,32 @@ fn build_priorities() -> HashMap<char, usize> {
     stuff
 }
 
+struct TripleState {
+    seen: HashSet<u8>,
+    reserve: HashSet<u8>,
+    iteration: usize,
+    sum: usize,
+}
+
+impl TripleState {
+    fn new() -> Self {
+        Self {
+            seen: HashSet::new(),
+            reserve: HashSet::new(),
+            iteration: 0,
+            sum: 0,
+        }
+    }
+
+    fn observe(&mut self) {
+
+
+        if self.iteration >= 2 {
+            // reset, we're on a new group of three.
+        }
+    }
+}
+
 struct Priorities;
 impl Priorities {
     fn get(c: char) -> Option<usize> {
@@ -43,6 +69,7 @@ impl Priorities {
     }
 }
 
+// I think I can use hashsets real dumbly for this one, too.
 fn part_two(inputs: &str) -> usize {
 
     0
@@ -82,12 +109,12 @@ CrZsJsPPZsGzwwsLwLmpwMDw
         assert_eq!(result, answer);
     }
 
-    // #[test]
-    // fn example_part_two() {
-    //     let answer = ();
-    //     let result = part_two(EXAMPLE);
-    //     assert_eq!(result, answer);
-    // }
+    #[test]
+    fn example_part_two() {
+        let answer = 70;
+        let result = part_two(EXAMPLE);
+        assert_eq!(result, answer);
+    }
 
     #[test]
     fn dumb() {
