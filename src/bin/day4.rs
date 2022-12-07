@@ -9,10 +9,18 @@ fn main() {
 }
 
 fn part_two(inputs: &str) -> usize {
-    0
+    part_all(inputs, |first, second| {
+        first.contains(second.start()) || first.contains(second.end()) || second.contains(first.start()) || second.contains(first.end())
+    })
 }
 
 fn part_one(inputs: &str) -> usize {
+    part_all(inputs, |first, second| {
+        (first.contains(second.start()) && first.contains(second.end())) || (second.contains(first.start()) && second.contains(first.end()))
+    })
+}
+
+fn part_all(inputs: &str, test: impl Fn(&RangeInclusive<usize>, &RangeInclusive<usize>) -> bool) -> usize {
     let range_pairs = inputs.lines().map(|line| {
         line
             .split(",")
@@ -29,7 +37,7 @@ fn part_one(inputs: &str) -> usize {
         let first = pair_iter.next().unwrap();
         let second = pair_iter.next().unwrap();
         // assert_eq!(None, pair_iter.next());
-        if (first.contains(second.start()) && first.contains(second.end())) || (second.contains(first.start()) && second.contains(first.end())) {
+        if test(&first, &second) {
             Some(())
         } else {
             None
@@ -59,8 +67,8 @@ mod tests {
 
     #[test]
     fn example_part_two() {
-        let answer = ();
+        let answer = 4;
         let result = part_two(EXAMPLE);
-        // assert_eq!(result, answer);
+        assert_eq!(result, answer);
     }
 }
